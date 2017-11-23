@@ -1,0 +1,43 @@
+Chat | Node | IMIE 
+
+Étape 1
+	Afficher une nouvelle page sur /chat contenant : 
+		- un formulaire pour le pseudo
+		- un formulaire pour un nouveau message
+		- une fenêtre de derniers messages
+
+Étape 2
+	Installer socket.io côté serveur et côté client
+	Créer le serveur côté serveur
+	Intégrer les .js côté client
+	Tester la connexion
+
+Étape 3 
+	Afficher un petit formulaire de pseudo
+	Sur soumission du formulaire de pseudo:
+		- garder en mémoire le pseudo côté client (créer une variable globale)
+		- cacher le formulaire de pseudo
+		- afficher la fenêtre pour les derniers messages
+		- afficher le formulaire pour envoyer un message
+
+Étape 4
+	Sur soumission du formulaire de message :
+		- envoyer le message en websocket au serveur, avec le pseudo
+	Côté serveur : 
+		- envoyer ce message à tout le monde, avec le pseudo ET la date actuelle
+
+Étape 5
+	Côté client : 
+		- écouter pour la réception de nouveaux messages
+		- sur réception d'un message, l'afficher dans la fenêtre des messages, avec le pseudo et la date en français
+
+Étape 6
+	Côté serveur : 
+		- garder en mémoire les 20 derniers messages
+		- lorsqu'un utilisateur se connecte, lui envoyer les 20 derniers messages
+	Côté client : 
+		- écouter pour la réception des 20 derniers messages
+		- afficher les 20 derniers messages
+
+Étape 7
+	Stocker les messages dans une table MySQL
