@@ -13,6 +13,7 @@ else {
     showLogin();
 }
 
+//permet de faire défiler la fenêtre de chat jusqu'en bas
 function updateScroll() {
     $('#messages_window').scrollTop($('#messages_window')[0].scrollHeight);
 }
@@ -69,87 +70,71 @@ $("#message_form").on("submit", function(e){
     $("#message_input").val("");
 });
 
-//écoute pour le message de type "login" d'un autre user envoyé par le serveur ws
-socket.on("login", function(data){
-    //affiche un message dans le chat
+function addSpecialChatMessage(message, color){
+    color = color || "";
+
+    //affiche un message spécial dans le chat
     var specialMessage = `
-        <div class="special_message">
-            <p>${data.username} just connected!</p>
+        <div class="special_message ${color}">
+            <p>${message}</p>
         </div>
     `;
 
     $("#messages_window").append(specialMessage);
     updateScroll();
+}
+
+//écoute pour le message de type "login" d'un autre user envoyé par le serveur ws
+socket.on("login", function(data){
+    addSpecialChatMessage(data.username + ' just connected!');
 });
 
 //écoute pour le message de type "self_login" envoyé par le serveur ws
 //pour sa propre connexion
 socket.on("self_login", function (data) {
-    //affiche un message dans le chat
-    var specialMessage = `
-        <div class="special_message">
-            <p>Hello ${data.username}!</p>
-        </div>
-    `;
-
-    $("#messages_window").append(specialMessage);
-    updateScroll();
+    addSpecialChatMessage('Hello ' + data.username);
 });
 
-//écoute pour le message de type "login" envoyé par le serveur ws
-socket.on("new_chat_message", function(data){
+//quand un utilisateur s'est déconnecté...
+socket.on("user_logout", function (data) {
+    addSpecialChatMessage(data.username + ' disconnected!', 'orange');
+})
 
-    var message = data.message;
-
-    //prépare et affiche le message dans le chat
+//ajoute un message au chat
+function addChatMessage(data){
+    //prépare le message pour le chat
     var messageHTML = `
         <div class="message">
             <div>
                 <span class="username_info">${data.username}</span>
                 <span class="data_info">${data.formattedDate}</span>
             </div>
-            <div class="message_content">${message}</div>
+            <div class="message_content">${data.message}</div>
         </div>
     `;
 
+    //ajoute au dom
     $("#messages_window").append(messageHTML);
+}
+
+//écoute pour le message de type "login" envoyé par le serveur ws
+socket.on("new_chat_message", function(data){
+    addChatMessage(data);
     updateScroll();
 })
 
+//quand on vient de se connecter, on recoit aussi ce message content les 20 derniers messages
 socket.on("last_messages", function(data){
     console.log("last_messages");
 
     for(var i = 0; i < data.messages.length; i++){
-        //prépare et affiche le message dans le chat
-        var messageHTML = `
-        <div class="message">
-            <div>
-                <span class="username_info">${data.messages[i].username}</span>
-                <span class="data_info">${data.messages[i].formattedDate}</span>
-            </div>
-            <div class="message_content">${data.messages[i].message}</div>
-        </div>
-    `;
-
-        $("#messages_window").append(messageHTML);
+        addChatMessage(data.messages[i]);
     }
 
     updateScroll();
 });
 
-
-socket.on("user_logout", function(data){
-    //affiche un message dans le chat
-    var specialMessage = `
-        <div class="special_message orange">
-            <p>${data.username} disconnected!</p>
-        </div>
-    `;
-
-    $("#messages_window").append(specialMessage);
-    updateScroll();
-})
-
+//quand on reçoit la liste des users connectés...
 socket.on("user_list", function(data){
     var userListString = data.usernames.join(" / ");
     $("#user_list").html(userListString);
