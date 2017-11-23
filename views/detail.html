@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <div class="left-col">
+        <img src="/img/posters/{{ movie.imdbId}}.jpg" 
+        alt="{{ movie.title }} ({{ movie.year }})">
+    </div>
+    <div class="right-col">
+        <h1>{{ movie.title }} ({{ movie.year }})</h1>
+        <p>{{ movie.plot }}</p>
+        <p>{{ movie.rating }} / 10</p>
+
+        <h3>actors</h3>
+        {% for actor in actors %}
+        <p>{{actor.name}}</p>
+        {% endfor %}
+
+        <h3>directors</h3>
+        {% for director in directors %}
+        <p>{{director.name}}</p>
+        {% endfor %}
+
+        <h3>writers</h3>
+        {% for writer in writers %}
+        <p>{{writer.name}}</p>
+        {% endfor %}
+
+        <h3>genres</h3>
+        {% for genre in genres %}
+        <p>{{genre.name}}</p>
+        {% endfor %}
+
+        {# video depuis youtube #}
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/{{movie.trailerId}}" frameborder="0" allowfullscreen></iframe>
+    </div>
+{% endblock %}

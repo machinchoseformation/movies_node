@@ -1,0 +1,49 @@
+body {
+    background-color: #000;
+    color: #FFF;
+}
+
+a {
+    color: #FFF;
+    text-decoration: none;
+}
+
+#search_form {
+    margin: 10px 0;
+}
+
+.movie img{
+    width: 200px;
+}
+
+.left-col, .right-col {
+    float: left;
+}
+
+.left-col {
+    width: 22%;
+    margin-right: 3%;
+}
+
+.right-col {
+    width: 75%;
+}
+
+.left-col img {
+    max-width: 100%;
+}
+
+#autocomplete_results {
+    background-color: rgba(255,255,255,0.8);
+    position: absolute;
+}
+
+#autocomplete_results a {
+    color: #000;
+    padding: 3px 5px;
+    display: block;
+}
+
+#autocomplete_results a:hover {
+    background-color: yellow;
+}

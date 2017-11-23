@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=u, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block title %}Movies!{% endblock %}</title>
+
+    <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+    <header>
+        <h1><a href="/" title="Go back home">Movies!</a></h1>
+        <form method="GET" id="search_form" action="/">
+            <input type="search" name="kw" value="" placeholder="Brad Pitt, Forrest Gump, etc." autocomplete="off" >
+            <button type="submit">OK</button>
+    
+            <div id="autocomplete_results"></div>
+        </form>    
+    </header>
+
+    {% block content %}{% endblock %}
+
+    <footer>
+        &copy; Movies!
+    </footer>
+
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/ajax_autocomplete.js"></script>
+</body>
+</html>

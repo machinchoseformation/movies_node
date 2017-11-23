@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    {% for movie in movies %}
+
+    <a href="/detail/{{ movie.id }}" class="movie">
+        <img src="img/posters/{{ movie.imdbId}}.jpg" 
+        alt="{{ movie.title }}">
+    </a>
+    
+    {% endfor %}
+{% endblock %}  
