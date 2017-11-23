@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=u, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://fonts.googleapis.com/css?family=Barlow+Semi+Condensed:400,400i,700" rel="stylesheet">
     <title>{% block title %}Movies!{% endblock %}</title>
 
     <link rel="stylesheet" href="/css/app.css">
@@ -19,13 +20,16 @@
         </form>    
     </header>
 
-    {% block content %}{% endblock %}
+        
+        {% block content %}{% endblock %}
 
     <footer>
         &copy; Movies!
     </footer>
 
     <script src="/js/jquery.min.js"></script>
+    <script src="/js/socket.io.slim.js"></script>
     <script src="/js/ajax_autocomplete.js"></script>
+    <script src="/js/chat.js"></script>
 </body>
 </html>

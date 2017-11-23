@@ -1,4 +1,5 @@
 body {
+    font-family: 'Barlow Semi Condensed', sans-serif;
     background-color: #000;
     color: #FFF;
 }
@@ -46,4 +47,67 @@ a {
 
 #autocomplete_results a:hover {
     background-color: yellow;
+}
+
+
+/* chat */
+#username_form {
+    display: none;
+}
+
+#messages_window {
+    display: none;
+    height: 200px;
+    padding: 10px;
+    background-color: #FFF;
+    color: #000;
+    overflow-y: scroll;
+}
+
+#message_form {
+    display: none;
+}
+
+.username_info {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.data_info {
+    color: #666;
+}
+
+.special_message {
+    padding: 3px 6px;
+    background-color: rgb(176, 216, 157);
+    text-align: center;
+}
+
+.special_message.orange {
+    background-color: rgb(236, 191, 128);
+}
+
+.special_message p {
+    margin: 0;
+}
+
+.message, .special_message {
+    margin-bottom: 10px;
+}
+
+#message_input {
+    width: 90%;
+    margin-top: 5px;
+    padding: 1% 10px;
+}
+
+h3 {
+    margin-bottom: 0;
+}
+
+footer {
+    margin-top: 30px;
+    padding-top: 10px;
+    border-top: 1px solid #333;
+    text-align: center;
 }

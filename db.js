@@ -33,7 +33,7 @@ const db = {
         return new Promise(function(resolve, reject){
             //requête pour rechercher en fct du titre de film ou nom de l'acteur
             let sql = `
-            SELECT distinct movie.id, movie.imdbId, movie.title 
+            SELECT DISTINCT movie.id, movie.imdbId, movie.title 
             FROM movie 
             JOIN movie_actor ON movie_actor.movieId = movie.id 
             JOIN people ON movie_actor.peopleId = people.id
@@ -139,6 +139,18 @@ const db = {
                 }
                 resolve(results);
             });
+        });
+    },
+
+    "saveChatMessage": function(data){
+        var sql = `INSERT INTO chat_message (username, message, dateSent) 
+        VALUES (?,?,?)`;
+
+        connection.query(sql, [data.username, data.message, data.mysqlDate], function(error, results){
+            if (error){
+                throw error;
+            }
+            console.log("message sauvegardé en bdd !");      
         });
     }
 };

@@ -10,7 +10,10 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.16.2",
+    "moment": "^2.19.2",
     "mysql": "^2.15.0",
-    "nunjucks": "^3.0.1"
+    "nunjucks": "^3.0.1",
+    "socket.io": "^2.0.4",
+    "xss-filters": "^1.2.7"
   }
 }

@@ -1,7 +1,7 @@
 //chaque fois qu'on relâche une touche du clavier
 $("#search_form input").on("keyup", function(){
     //on vide les suggestions avant d'en mettre de nouvelles
-    $("#autocomplete_results").empty();
+    $("#movies").empty();
 
     //on récupère la valeur de l'input
     var kw = $(this).val();
@@ -24,9 +24,9 @@ $("#search_form input").on("keyup", function(){
                 break;
             }
             //on crée un lien...
-            var link = '<a href="/detail/'+response[i].id+'">'+response[i].title+'</a>';
+            var link = '<a href="/detail/'+response[i].id+'"><img src="/img/posters/'+response[i].imdbId+'.jpg"></a>';
             //...qu'on ajoute dans la div prévue à cet effet
-            $("#autocomplete_results").append(link);
+            $("#movies").append(link);
         }
     });
 });

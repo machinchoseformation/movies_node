@@ -26,7 +26,7 @@ const movieController = {
         
         //si on a un mot-clef dans l'URL à rechercher...
         if (req.query.kw){
-            keyword = req.query.kw
+            let keyword = req.query.kw
             var p = db.searchMovies(keyword);
         }
         else {

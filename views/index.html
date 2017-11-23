@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
+    <div id="movies">
     {% for movie in movies %}
 
     <a href="/detail/{{ movie.id }}" class="movie">
@@ -10,4 +10,5 @@
     </a>
     
     {% endfor %}
+</div>
 {% endblock %}  
