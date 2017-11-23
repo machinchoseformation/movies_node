@@ -10,7 +10,7 @@ const app = express();
 const http = require('http').Server(app);
 
 //crée notre serveur websocket de chat
-const chatServer = require("./chat-server.js")(http);
+const chatServer = require("./chatServer.js")(http);
 
 //inclue nos contrôleurs
 const movieController = require("./movieController.js");
