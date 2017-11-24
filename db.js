@@ -192,14 +192,15 @@ const db = {
                 [movie.imdbId, movie.title, movie.year, movie.plot, movie.rating, movie.votes, 
                     movie.runtime, movie.trailerId], function (error, results) {
                 if (error) {
-                    throw error;
+                    reject(error);
                 }
                 else {
                     //récupère l'id du film fraîchement ajouté en bdd
                     movie.id = results.insertId;
+                    resolve(movie)
                     
                     //on gère maintenant les acteurs, les directors, les writers
-                    db.getAllPeoples().then((peoples) => {
+                    //db.getAllPeoples().then((peoples) => {
                         //@todo
                         //si un acteur n'existe pas déjà
                             //on le sauvegarde
@@ -209,10 +210,10 @@ const db = {
                             //on récupère son id dans le tableau des people
 
                         //on sauvegarde la relation dans la table acteur
-                    })
-                    .catch((error) => {
-                        throw error
-                    })
+                    //})
+                    //.catch((error) => {
+                    //    throw error
+                    //})
                 }
             });
         });
