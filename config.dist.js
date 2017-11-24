@@ -4,6 +4,9 @@ const config = {
         user     : 'root',
         password : 'root',
         database : 'movies_imie_node'
+    },
+    youtube: {
+        apikey: 'yourApiKeyHere'
     }
 }
 

@@ -35,6 +35,7 @@ app.get("/detail/:movieId", movieController.detailPage);
 //les requêtes ajax sont envoyées à cette URL
 app.get("/api/ajax_search/", movieController.ajaxSearch);
 
+//affiche la page HTML du chat (et that's it)
 app.get("/chat", chatController.chatPage);
 
 //le serveur écoute sur le port 3000

@@ -4,9 +4,13 @@ const mysql = require("mysql");
 const config = require("./config.js");
 
 //on se connecte à la bdd
-var connection = mysql.createConnection(config.db);
+var connection = mysql.createConnection(config.db); 
 
 const db = {
+    "closeConnection": function(){
+        connection.destroy();
+    },
+
     //récupère 50 films au hasard
     "getRandomMovies": function(){
         //retourne une Promise 
@@ -66,6 +70,42 @@ const db = {
                     reject(error);
                 }
                 resolve(results[0]);
+            });
+        });
+    },
+
+    //récupère un film en fonction de son imdbId
+    "getMovieByImdbId": function(movieId){
+        return new Promise(function(resolve, reject){
+            var sql = `SELECT * FROM movie WHERE imdbId = ?`; 
+            connection.query(sql, [movieId], function (error, results) {
+                if (error) {
+                    //on rejette la promise
+                    reject(error);
+                }
+
+                if (results.length < 1){
+                    resolve(null);
+                }
+                else {
+                    resolve(results[0]);
+                }
+            });
+        });
+    },
+
+    //récupère les acteurs d'un film
+    "getAllPeoples": function () {
+        return new Promise(function (resolve, reject) {
+            var sql = `
+            SELECT * FROM people`;
+
+            connection.query(sql, function (error, results) {
+                if (error) {
+                    //on rejette la promise
+                    reject(error);
+                }
+                resolve(results);
             });
         });
     },
@@ -142,6 +182,42 @@ const db = {
         });
     },
 
+    "insertMovie": function (movie) {
+        return new Promise(function(resolve, reject){
+            var sql = `INSERT INTO movie 
+            (id, imdbId, title, year, plot, rating, votes, runtime, trailerId, dateCreated, dateModified) 
+            VALUES (NULL,?,?,?,?,?,?,?,?,NOW(),NOW())`;
+
+            connection.query(sql, 
+                [movie.imdbId, movie.title, movie.year, movie.plot, movie.rating, movie.votes, 
+                    movie.runtime, movie.trailerId], function (error, results) {
+                if (error) {
+                    throw error;
+                }
+                else {
+                    //récupère l'id du film fraîchement ajouté en bdd
+                    movie.id = results.insertId;
+                    
+                    //on gère maintenant les acteurs, les directors, les writers
+                    db.getAllPeoples().then((peoples) => {
+                        //@todo
+                        //si un acteur n'existe pas déjà
+                            //on le sauvegarde
+                            //on récupère son id
+
+                        //sinon
+                            //on récupère son id dans le tableau des people
+
+                        //on sauvegarde la relation dans la table acteur
+                    })
+                    .catch((error) => {
+                        throw error
+                    })
+                }
+            });
+        });
+    },
+
     "saveChatMessage": function(data){
         var sql = `INSERT INTO chat_message (username, message, dateSent) 
         VALUES (?,?,?)`;
@@ -152,7 +228,7 @@ const db = {
             }
             console.log("message sauvegardé en bdd !");      
         });
-    }
+    },
 };
 
 //rend cette variable disponible
