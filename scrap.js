@@ -26,7 +26,13 @@ function extractMoviesFromList(listUrl){
     let newMovies = [];
 
     return new Promise((resolve, reject) => {
-        request(listUrl, (error, response, body) => {
+        request({
+            url: listUrl,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
+                'Accept-Language': 'en'
+            }
+        }, (error, response, body) => {
 
             let $ = cheerio.load(body)
 
@@ -96,7 +102,13 @@ function checkIfMovieExists(imdbId){
 function extractDataFromDetailPage(movie){
     console.log("getting details for " + movie.title)
     return new Promise((resolve, reject) => {
-        request(movie.detailUrl, (error, response, body) => {
+        request({
+            url: movie.detailUrl,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
+                'Accept-Language': 'en'
+            }
+        }, (error, response, body) => {
             let $ = cheerio.load(body)
 
             //runtime
@@ -145,6 +157,9 @@ function extractDataFromDetailPage(movie){
                 movie.writers.push($(el).text())
             })
 
+            //poster 
+            movie.posterUrl = $(".poster img").attr("src")
+
             resolve(movie)
         })
     })
@@ -192,6 +207,10 @@ function saveMovies(movies){
         throw error
     })
         
+}
+
+function downloadPoster(posterUrl){
+    
 }
 
 function scrapDetailPages(movies){

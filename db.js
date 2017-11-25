@@ -182,6 +182,53 @@ const db = {
         });
     },
 
+    "getPeopleByName": function(name){
+        return new Promise(function (resolve, reject) {
+            var sql = `SELECT * FROM people WHERE name = ?`;
+
+            connection.query(sql, [name], function (error, results) {
+                if (error) {
+                    reject(error);
+                }
+                else {
+                    resolve(results)
+                }
+            })
+        })
+    },
+
+    "insertPerson": function(name){
+        return new Promise(function (resolve, reject) {
+            var sql = `INSERT INTO people (id, name) VALUES (NULL,?)`;
+
+            connection.query(sql, [name], function (error, results) {
+                if (error) {
+                    reject(error)
+                }
+                else {
+                    person = {}
+                    person.id = results.insertId                        
+                    person.name = name
+                    resolve(person)
+                }
+            })
+        })
+    },
+
+    "insertMoviePeopleRelation": function (table, movieId, personId) {
+        return new Promise(function (resolve, reject) {
+            var sql = `INSERT INTO ${table} (movieId, peopleId) VALUES (?,?)`;
+            connection.query(sql, [movieId, personId], function (error, results) {
+                if (error) {
+                    reject(error)
+                }
+                else {
+                    resolve({movieId: movieId, peopleId: personId})
+                }
+            })
+        })
+    },
+
     "insertMovie": function (movie) {
         return new Promise(function(resolve, reject){
             var sql = `INSERT INTO movie 
@@ -189,34 +236,95 @@ const db = {
             VALUES (NULL,?,?,?,?,?,?,?,?,NOW(),NOW())`;
 
             connection.query(sql, 
-                [movie.imdbId, movie.title, movie.year, movie.plot, movie.rating, movie.votes, 
-                    movie.runtime, movie.trailerId], function (error, results) {
+                [movie.imdbId, movie.title, movie.year, movie.plot, movie.rating, movie.votes, movie.runtime, movie.trailerId], function (error, results) {
                 if (error) {
                     reject(error);
                 }
                 else {
                     //récupère l'id du film fraîchement ajouté en bdd
                     movie.id = results.insertId;
-                    resolve(movie)
-                    
-                    //on gère maintenant les acteurs, les directors, les writers
-                    //db.getAllPeoples().then((peoples) => {
-                        //@todo
-                        //si un acteur n'existe pas déjà
-                            //on le sauvegarde
-                            //on récupère son id
 
-                        //sinon
-                            //on récupère son id dans le tableau des people
+                    let p1 = db.insertMoviePeopleRelations(movie.id, movie.actors, "movie_actor")
+                    let p2 = db.insertMoviePeopleRelations(movie.id, movie.directors, "movie_director")
+                    let p3 = db.insertMoviePeopleRelations(movie.id, movie.writers, "movie_writer")
+                    let p4 = db.insertMovieGenreRelations(movie.id, movie.genres)
 
-                        //on sauvegarde la relation dans la table acteur
-                    //})
-                    //.catch((error) => {
-                    //    throw error
-                    //})
+                    Promise.all([p1,p2,p3,p4])
+                    .then(() => {
+                        resolve(movie)
+                    })
+                    .catch((error) => {
+                        throw error
+                    })
                 }
             });
         });
+    },
+
+    "insertMoviePeopleRelations": function(movieId, persons, tableName){
+        return new Promise((resolve, reject) => {
+            persons.forEach((person) => {
+                db.getPeopleByName(person)
+                .then((result) => {
+                    if (result.length >  0) {
+                        db.insertMoviePeopleRelation(tableName, movieId, result[0].id)
+                        .then(() => { 
+                            resolve() 
+                        })
+                        .catch((error) =>  {
+                            throw error
+                        })
+                    }
+                    else {
+                        db.insertPerson(person)
+                        .then((person) => {
+                            db.insertMoviePeopleRelation(tableName, movieId, person.id)
+                            .then(() => {
+                                resolve()
+                            })
+                            .catch((error) => {
+                                throw error
+                            })
+                        })
+                        .catch((error) => {
+                            reject(error)
+                        })
+                    }
+                })
+                .catch((error) => {
+                    reject(error)
+                })
+            })
+        })
+    },
+
+    "insertMovieGenreRelations": function (movieId, genres) {
+        return new Promise((resolve, reject) => {
+            connection.query('SELECT * FROM genre', function (error, results) {
+                if (error) {
+                    reject(error)
+                }
+                let sqlValues = []
+                genres.forEach((genreName) => {
+                    let genreId = null
+                    results.forEach((genreFromDb) => {
+                        if (genreFromDb.name == genreName){
+                            genreId = genreFromDb.id
+                        }
+                    })
+                    sqlValues.push(`(${movieId}, ${genreId})`)
+                })
+
+                sqlValuesString = sqlValues.join(',')
+
+                connection.query(`INSERT INTO movie_genre VALUES ${sqlValuesString}`, function(error, results){
+                    if (error) {
+                        reject(error)
+                    }
+                    resolve(true)
+                })
+            })
+        })
     },
 
     "saveChatMessage": function(data){
