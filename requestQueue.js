@@ -1,28 +1,25 @@
-const url = require('url')
+const {URL} = require('url')
 const request = require('request')
 
 let requests = []
-
 let lastRequestTime = 0
-
 let delay = null
-
 
 function requestQueue(delayMs){
 
-    this.requestsDebug = []
-
+    this.requestsDebug = {}
     delay = delayMs || 500
 
     this.execute = () => {
-        while (requests.length > 0) {
-            let now = new Date().getTime()
-            if ((lastRequestTime+delay) <= now) {
-                let req = requests.shift()
-                this.requestsDebug.push({ time: now})
-                lastRequestTime = now
-                return request(req.options, req.callback)
-
+        for(hostname in requests){
+            while (requests[hostname].requests.length > 0) {
+                let now = new Date().getTime()
+                if ((requests[hostname].lastRequestTime+delay) <= now) {
+                    let req = requests[hostname].requests.shift()
+                    this.requestsDebug[hostname].push({time: now})
+                    requests[hostname].lastRequestTime = now
+                    return request(req.options, req.callback)
+                }
             }
         }
     }
@@ -33,8 +30,21 @@ function requestQueue(delayMs){
             callback: callback,
         }
 
-        requests.push(requestObj)
+        let urlObject = new URL(requestObj.options.url)
+        hostname = urlObject.hostname
 
+        if (!requests[hostname]){
+            requests[hostname] = {
+                lastRequestTime: new Date().getTime(),
+                requests: []
+            }
+        }
+
+        if (!this.requestsDebug[hostname]) {
+            this.requestsDebug[hostname] = []
+        }
+
+        requests[hostname].requests.push(requestObj)
         return this.execute()
     }
 

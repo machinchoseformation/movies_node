@@ -112,7 +112,8 @@ function extractDataFromDetailPage(movie){
                 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
                 'Accept-Language': 'en'
             }
-        }, (error, response, body) => {
+        }, 
+        (error, response, body) => {
             let $ = cheerio.load(body)
 
             //runtime
@@ -163,8 +164,14 @@ function extractDataFromDetailPage(movie){
 
             //poster 
             movie.posterUrl = $(".poster img").attr("src")
-
-            resolve(movie)
+            downloadPoster(movie.posterUrl, movie.imdbId)
+            .then((result) => {
+                console.log("poster downloaded!", movie.title)
+                resolve(movie)
+            })
+            .catch((reason) => {
+                console.log(reason)
+            })
         })
     })
 }
@@ -188,7 +195,8 @@ function getYoutubeTrailerId(movie){
 }
 
 function saveMovies(movies){
-    var promises = []
+
+    let promises = []
 
     movies.forEach((movie) => {
         let insertPromise = db.insertMovie(movie)
@@ -200,28 +208,13 @@ function saveMovies(movies){
         .catch((reason) => {
             console.log(reason)
         })
-
-        let picPromise = downloadPoster(movie.posterUrl, movie.imdbId)
-        promises.push(picPromise)
-        picPromise
-        .then((result) => {
-            console.log("poster downloaded! " + movie.title)
-        })
-        .catch((reason) => {
-            console.log(reason)
-        })
     })
 
     Promise.all(promises)
-    .then(() => {
-        db.closeConnection()
-        console.log("the end")
-        console.log(requestQueue.requestsDebug)
-    })
+    .then(thisIsTheEnd)
     .catch((error) => {
         throw error
-    })
-        
+    })  
 }
 
 function downloadPoster(posterUrl, imdbId){
@@ -266,6 +259,12 @@ function scrapDetailPages(movies){
     .catch((error) => {
         throw error
     })
+}
+
+function thisIsTheEnd(){
+    db.closeConnection()
+    console.log("the end")
+    console.log(requestQueue.requestsDebug)
 }
 
 extractMoviesFromList(startUrl)
