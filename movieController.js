@@ -64,8 +64,8 @@ const movieController = {
             res.render("detail.html", {
                 "movie": values[0], 
                 "actors": values[1],
-                "genres": values[2],
-                "directors": values[3],
+                "directors": values[2],                
+                "genres": values[3],
                 "writers": values[4],
             });
         });
