@@ -11,6 +11,8 @@ const fs = require('fs')
 
 const config = require('./config.js')
 
+const requestQueue = require('./requestQueue.js')(500)
+
 //url de base d'imdb
 const rootUrl = "http://akas.imdb.com/";
 
@@ -28,7 +30,7 @@ function extractMoviesFromList(listUrl){
     let newMovies = [];
 
     return new Promise((resolve, reject) => {
-        request({
+        requestQueue.add({
             url: listUrl,
             headers: {
                 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
@@ -104,7 +106,7 @@ function checkIfMovieExists(imdbId){
 function extractDataFromDetailPage(movie){
     console.log("getting details for " + movie.title)
     return new Promise((resolve, reject) => {
-        request({
+        requestQueue.add({
             url: movie.detailUrl,
             headers: {
                 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
@@ -172,7 +174,7 @@ function getYoutubeTrailerId(movie){
         console.log("calling youtube for " + movie.title)
 
         let apiCall = youtubeApiUrl.replace('{MOVIE_TITLE}', encodeURIComponent(movie.title))
-        request(apiCall, function (error, response, body) {
+        requestQueue.add({url: apiCall}, function (error, response, body) {
             let results = JSON.parse(body)
             if (results.items.length < 1){
                 reject("no results")
@@ -214,6 +216,7 @@ function saveMovies(movies){
     .then(() => {
         db.closeConnection()
         console.log("the end")
+        console.log(requestQueue.requestsDebug)
     })
     .catch((error) => {
         throw error
@@ -227,11 +230,11 @@ function downloadPoster(posterUrl, imdbId){
     let filename = __dirname + '/assets/img/posters/' + imdbId + '.jpg'
 
     return new Promise((resolve, reject) => {
-        request(correctedPosterUrl)
-            .pipe(fs.createWriteStream(filename))
-            .on('close', () => {
-                resolve()   
-            });
+        let rs = requestQueue.add({url: correctedPosterUrl})
+        rs.pipe(fs.createWriteStream(filename))
+        .on('close', () => {
+            resolve()   
+        })
     })
 }
 
