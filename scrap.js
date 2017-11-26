@@ -7,6 +7,8 @@ const cheerio = require('cheerio')
 //permet de recréer des urls absolues facilement
 const url = require('url')
 
+const fs = require('fs')
+
 const config = require('./config.js')
 
 //url de base d'imdb
@@ -187,11 +189,21 @@ function saveMovies(movies){
     var promises = []
 
     movies.forEach((movie) => {
-        let promise = db.insertMovie(movie)
-        promises.push(promise)
-        promise
+        let insertPromise = db.insertMovie(movie)
+        promises.push(insertPromise)
+        insertPromise
         .then((movie) => {
             console.log("inserted! " + movie.title)
+        })
+        .catch((reason) => {
+            console.log(reason)
+        })
+
+        let picPromise = downloadPoster(movie.posterUrl, movie.imdbId)
+        promises.push(picPromise)
+        picPromise
+        .then((result) => {
+            console.log("poster downloaded! " + movie.title)
         })
         .catch((reason) => {
             console.log(reason)
@@ -209,8 +221,18 @@ function saveMovies(movies){
         
 }
 
-function downloadPoster(posterUrl){
-    
+function downloadPoster(posterUrl, imdbId){
+
+    let correctedPosterUrl = posterUrl.replace(/@\..*/, '@._SX350_.jpg')
+    let filename = __dirname + '/assets/img/posters/' + imdbId + '.jpg'
+
+    return new Promise((resolve, reject) => {
+        request(correctedPosterUrl)
+            .pipe(fs.createWriteStream(filename))
+            .on('close', () => {
+                resolve()   
+            });
+    })
 }
 
 function scrapDetailPages(movies){
